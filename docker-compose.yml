@@ -1,0 +1,13 @@
+version: '3.9'
+
+services:
+
+  oam-database:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'oam'
+      MYSQL_PASSWORD: '4321'
+      MYSQL_ROOT_PASSWORD: '4321'
+    ports:
+      - '3306:3306'
