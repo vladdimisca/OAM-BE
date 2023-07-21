@@ -2,8 +2,10 @@ package com.oam.controller;
 
 import com.oam.dto.AssociationResponseDto;
 import com.oam.dto.CreateAssociationRequestDto;
+import com.oam.dto.UpdateAssociationRequestDto;
 import com.oam.mapper.AssociationMapper;
 import com.oam.model.Association;
+import com.oam.model.AssociationRole;
 import com.oam.service.AssociationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,13 @@ public class AssociationController {
                 .body(associationMapper.mapToDto(association));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<AssociationResponseDto> update(@PathVariable("id") UUID id,
+                                                         @Valid @RequestBody UpdateAssociationRequestDto updateAssociationRequestDto) {
+        Association association = associationService.updateById(id, associationMapper.mapToEntity(updateAssociationRequestDto));
+        return ResponseEntity.ok(associationMapper.mapToDto(association));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<AssociationResponseDto> getById(@PathVariable("id") UUID id) {
         Association association = associationService.getById(id);
@@ -37,8 +46,20 @@ public class AssociationController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AssociationResponseDto>> getAll() {
-        List<Association> associations = associationService.getAll();
+    public ResponseEntity<List<AssociationResponseDto>> getAll(@RequestParam(value = "role", required = false) AssociationRole role) {
+        List<Association> associations = associationService.getAll(role);
         return ResponseEntity.ok(associations.stream().map(associationMapper::mapToDto).toList());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteById(@PathVariable("id") UUID id) {
+        associationService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/join")
+    public ResponseEntity<?> join(@RequestParam("code") String code) {
+        associationService.join(code);
+        return ResponseEntity.noContent().build();
     }
 }

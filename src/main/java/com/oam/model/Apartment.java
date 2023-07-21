@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.JdbcTypeCode;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,6 +36,9 @@ public class Apartment {
     @Convert(converter = ApartmentCodeConverter.class)
     private String code;
 
+    @Column(name = "surface")
+    private Double surface;
+
     @OneToMany(mappedBy = "apartment",
             fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE},
@@ -45,4 +49,10 @@ public class Apartment {
     @ManyToOne
     @JoinColumn(name = "association_id", referencedColumnName = "id")
     private Association association;
+
+    @OneToMany(mappedBy = "apartment", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<InvoiceDistribution> invoiceDistributions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "apartment", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<Index> indexes = new ArrayList<>();
 }

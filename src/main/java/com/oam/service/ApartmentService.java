@@ -45,7 +45,7 @@ public class ApartmentService {
     }
 
     private boolean isUserAnAdminAssociationMember(User user, Association association) {
-        return user.getAssociationMembers().stream().noneMatch(
+        return user.getAssociationMembers().stream().anyMatch(
                             member -> member.getRole() == AssociationRole.ADMIN
                             && member.getAssociation().getId().equals(association.getId()));
     }

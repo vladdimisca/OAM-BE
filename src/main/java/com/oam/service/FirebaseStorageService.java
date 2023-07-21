@@ -23,8 +23,8 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class FirebaseStorageService {
 
-    public URL uploadImage(String imageName, MultipartFile image) throws IOException {
-        Blob blob = getDefaultBucket().create(imageName, image.getInputStream(), "image");
+    public URL uploadFile(String imageName, MultipartFile image, String contentType) throws IOException {
+        Blob blob = getDefaultBucket().create(imageName, image.getInputStream(), contentType);
         BlobInfo blobInfo = BlobInfo.newBuilder(System.getenv(FirebaseConstants.BUCKET_NAME), blob.getName()).build();
         return getDefaultBucket().getStorage().signUrl(blobInfo, 365 * 10, TimeUnit.DAYS);
     }

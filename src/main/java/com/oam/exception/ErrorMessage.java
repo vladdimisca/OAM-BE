@@ -12,7 +12,8 @@ public enum ErrorMessage {
     FORBIDDEN(4, "This action is forbidden!"),
     PASSWORDS_NOT_MATCHING(5, "The provided password is invalid!"),
     EMAIL_NOT_ASSOCIATED(6, "There is no account associated with this email!"),
-    NOT_ALLOWED_TO_CREATE_APARTMENTS(7, "Only the administrators of this association can create apartments!");
+    NOT_ALLOWED_TO_CREATE_APARTMENTS(7, "Only the administrators of this association can create apartments!"),
+    MUST_BE_ADMIN_ASSOCIATION_MEMBER(8, "You must be an association member with admin rights to perform this action!");
 
 
     private final int errorCode;

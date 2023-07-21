@@ -57,4 +57,7 @@ public class Association {
 
     @OneToMany(mappedBy = "association", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
     private List<Apartment> apartments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "association", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<Invoice> invoices = new ArrayList<>();
 }

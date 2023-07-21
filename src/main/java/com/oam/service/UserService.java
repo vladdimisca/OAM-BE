@@ -62,7 +62,7 @@ public class UserService {
         User user = getById(userId);
         securityService.authorize(userId);
 
-        URL profilePictureURL = firebaseStorageService.uploadImage(userId.toString(), image);
+        URL profilePictureURL = firebaseStorageService.uploadFile(userId.toString(), image, "image");
         user.getUserDetails().setProfilePictureURL(profilePictureURL.toString());
         return userRepository.save(user);
     }

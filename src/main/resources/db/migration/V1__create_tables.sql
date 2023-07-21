@@ -39,7 +39,8 @@ CREATE TABLE IF NOT EXISTS `apartments` (
     `id` VARCHAR(50) NOT NULL,
     `number` VARCHAR(50) NOT NULL,
     `number_of_persons` INT NOT NULL,
-    `code` VARCHAR(10) NOT NULL,
+    `code` VARCHAR(100) NOT NULL,
+    `surface` DOUBLE NOT NULL,
     `association_id` VARCHAR(50) NOT NULL,
 
     PRIMARY KEY (`id`),
@@ -57,4 +58,45 @@ CREATE TABLE IF NOT EXISTS `association_members` (
     FOREIGN KEY (`member_id`) REFERENCES `users`(`id`),
     FOREIGN KEY (`association_id`) REFERENCES `associations`(`id`),
     FOREIGN KEY (`apartment_id`) REFERENCES `apartments`(`id`)
+);
+
+CREATE TABLE IF NOT EXISTS `invoices` (
+    `id` VARCHAR(50) NOT NULL,
+    `document_url` TEXT NOT NULL,
+    `month` INT NOT NULL,
+    `year` INT NOT NULL,
+    `name` VARCHAR(50) NOT NULL,
+    `number` VARCHAR(50) NOT NULL,
+    `amount` DOUBLE NOT NULL,
+    `type` VARCHAR(50) NOT NULL,
+    `method` VARCHAR(50) NOT NULL,
+    `association_id` VARCHAR(50) NOT NULL,
+
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`association_id`) REFERENCES `associations`(`id`)
+);
+
+CREATE TABLE IF NOT EXISTS `indexes` (
+    `id` VARCHAR(50) NOT NULL,
+    `old_index` DOUBLE NOT NULL,
+    `new_index` DOUBLE NOT NULL,
+    `type` VARCHAR(50) NOT NULL,
+    `month` INT NOT NULL,
+    `year` INT NOT NULL,
+    `apartment_id` VARCHAR(50) NOT NULL,
+
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`apartment_id`) REFERENCES `apartments`(`id`)
+);
+
+CREATE TABLE IF NOT EXISTS `invoices_distribution` (
+    `id` VARCHAR(50) NOT NULL,
+    `amount` DOUBLE NOT NULL,
+    `is_paid` BOOLEAN NOT NULL,
+    `apartment_id` VARCHAR(50) NOT NULL,
+    `invoice_id` VARCHAR(50) NOT NULL,
+
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`apartment_id`) REFERENCES `apartments`(`id`),
+    FOREIGN KEY (`invoice_id`) REFERENCES `invoices`(`id`)
 );

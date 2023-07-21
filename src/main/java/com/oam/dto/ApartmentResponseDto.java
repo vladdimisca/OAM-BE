@@ -7,5 +7,6 @@ public record ApartmentResponseDto(
         String number,
         Integer numberOfPersons,
         String code,
+        Double surface,
         UUID associationId
 ) { }
