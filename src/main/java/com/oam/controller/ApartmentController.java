@@ -1,9 +1,9 @@
 package com.oam.controller;
 
-import com.oam.dto.ApartmentResponseDto;
-import com.oam.dto.CreateApartmentRequestDto;
+import com.oam.dto.*;
 import com.oam.mapper.ApartmentMapper;
 import com.oam.model.Apartment;
+import com.oam.model.Association;
 import com.oam.service.ApartmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +30,13 @@ public class ApartmentController {
                 .body(apartmentMapper.mapToDto(apartment));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ApartmentResponseDto> update(@PathVariable("id") UUID id,
+                                                         @Valid @RequestBody UpdateApartmentRequestDto updateApartmentRequestDto) {
+        Apartment association = apartmentService.updateById(id, apartmentMapper.mapToEntity(updateApartmentRequestDto));
+        return ResponseEntity.ok(apartmentMapper.mapToDto(association));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApartmentResponseDto> getById(@PathVariable("id") UUID id) {
         Apartment apartment = apartmentService.getById(id);
@@ -37,8 +44,14 @@ public class ApartmentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ApartmentResponseDto>> getAll() {
-        List<Apartment> apartments = apartmentService.getAll();
+    public ResponseEntity<List<ApartmentResponseDto>> getAll(@RequestParam(value = "associationId", required = false) UUID associationId) {
+        List<Apartment> apartments = apartmentService.getAll(associationId);
         return ResponseEntity.ok(apartments.stream().map(apartmentMapper::mapToDto).toList());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteById(@PathVariable("id") UUID id) {
+        apartmentService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

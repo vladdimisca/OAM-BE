@@ -23,9 +23,8 @@ public class InvoiceDistribution {
     @JdbcTypeCode(java.sql.Types.VARCHAR)
     private UUID id;
 
+    @Column(name = "amount")
     private Double amount;
-
-    private Boolean isPaid;
 
     @ManyToOne
     @JoinColumn(name = "apartment_id", referencedColumnName = "id")
@@ -34,4 +33,8 @@ public class InvoiceDistribution {
     @ManyToOne
     @JoinColumn(name = "invoice_id", referencedColumnName = "id")
     private Invoice invoice;
+
+    @ManyToOne
+    @JoinColumn(name = "payment_id", referencedColumnName = "id")
+    private Payment payment;
 }

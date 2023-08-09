@@ -37,5 +37,5 @@ public interface AssociationRepository extends JpaRepository<Association, UUID> 
         """
         DELETE FROM AssociationMember am WHERE am.association.id = :associationId
         """)
-    void deleteAssociationMembersByFamilyId(@Param("associationId") UUID associationId);
+    void deleteAssociationMembersByAssociationId(@Param("associationId") UUID associationId);
 }

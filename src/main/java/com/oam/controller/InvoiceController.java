@@ -17,8 +17,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
-import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
-
 @RestController
 @RequestMapping("/api/invoices")
 @RequiredArgsConstructor
@@ -30,7 +28,7 @@ public class InvoiceController {
     @PostMapping
     public ResponseEntity<InvoiceResponseDto> create(
             @Valid @RequestPart("invoice") String createInvoiceRequestDto,
-            @RequestPart("document") MultipartFile document) throws IOException {
+            @RequestPart(value = "document", required = false) MultipartFile document) throws IOException {
         CreateInvoiceRequestDto invoiceRequestDto = new ObjectMapper().readValue(createInvoiceRequestDto, CreateInvoiceRequestDto.class);
         Invoice invoice = invoiceService.create(invoiceMapper.mapToEntity(invoiceRequestDto), document);
         return ResponseEntity
@@ -48,5 +46,11 @@ public class InvoiceController {
     public ResponseEntity<List<InvoiceResponseDto>> getAll() {
         List<Invoice> invoices = invoiceService.getAll();
         return ResponseEntity.ok(invoices.stream().map(invoiceMapper::mapToDto).toList());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteById(@PathVariable("id") UUID id) {
+        invoiceService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

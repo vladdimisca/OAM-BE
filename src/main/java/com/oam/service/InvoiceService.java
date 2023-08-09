@@ -1,9 +1,10 @@
 package com.oam.service;
 
 import com.oam.exception.ErrorMessage;
+import com.oam.exception.model.BadRequestException;
+import com.oam.exception.model.ForbiddenException;
 import com.oam.exception.model.NotFoundException;
-import com.oam.model.Association;
-import com.oam.model.Invoice;
+import com.oam.model.*;
 import com.oam.repository.InvoiceRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
+
+import static com.oam.exception.ErrorMessage.CANNOT_DELETE_PAID_INVOICES;
 
 @Service
 @RequiredArgsConstructor
@@ -24,12 +29,26 @@ public class InvoiceService {
     private final FirebaseStorageService firebaseStorageService;
     private final AssociationService associationService;
     private final InvoiceDistributionService invoiceDistributionService;
+    private final SecurityService securityService;
+    private final UserService userService;
 
     @Transactional
     public Invoice create(Invoice invoice, MultipartFile document) throws IOException {
+        if (invoice.getMethod() == InvoiceMethod.PER_COUNTER && invoice.getPricePerIndexUnit() == null) {
+            throw new BadRequestException(ErrorMessage.PRICE_PER_INDEX_UNIT_NOT_PROVIDED);
+        }
+        if (document == null) {
+            List<String> documentUrls = invoiceRepository.findInvoiceUrlByNumber(invoice.getNumber());
+            if (documentUrls.isEmpty()) {
+                throw new BadRequestException(ErrorMessage.INVOICE_NUMBER_NOT_EXISTING);
+            }
+            String persistedUrl = invoiceRepository.findInvoiceUrlByNumber(invoice.getNumber()).get(0);
+            invoice.setDocumentUrl(persistedUrl);
+        } else {
+            URL documentUrl = firebaseStorageService.uploadFile(createUniqueName(document.getName()), document, document.getContentType());
+            invoice.setDocumentUrl(documentUrl.toString());
+        }
         Association association = associationService.getById(invoice.getAssociation().getId());
-        URL documentUrl = firebaseStorageService.uploadFile(createUniqueName(document.getName()), document, document.getContentType());
-        invoice.setDocumentUrl(documentUrl.toString());
         invoice.setAssociation(association);
         Invoice persistedInvoice = invoiceRepository.save(invoice);
         invoiceDistributionService.distribute(invoice);
@@ -41,11 +60,40 @@ public class InvoiceService {
     }
 
     public Invoice getById(UUID id) {
-        return invoiceRepository.findById(id).orElseThrow(() ->
+        User user = userService.getById(securityService.getUserId());
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow(() ->
                 new NotFoundException(ErrorMessage.NOT_FOUND, "invoice", id));
+        if (getAssociationMember(user, invoice.getAssociation(), null).isEmpty()) {
+            throw new ForbiddenException(ErrorMessage.FORBIDDEN);
+        }
+        return invoice;
     }
 
     public List<Invoice> getAll() {
-        return invoiceRepository.findAll();
+        User user = userService.getById(securityService.getUserId());
+        return invoiceRepository.findAllByUserId(user.getId());
+    }
+
+    public void deleteById(UUID id) {
+        User user = userService.getById(securityService.getUserId());
+        Invoice invoice = getById(id);
+        if (getAssociationMember(user, invoice.getAssociation(), AssociationRole.ADMIN).isEmpty()) {
+            throw new ForbiddenException(ErrorMessage.FORBIDDEN);
+        }
+        checkInvoiceNotPaidByAnyAssociationMember(invoice);
+        invoiceRepository.delete(invoice);
+    }
+
+    private Optional<AssociationMember> getAssociationMember(User user, Association association, AssociationRole role) {
+        return user.getAssociationMembers().stream()
+                .filter(associationMember -> associationMember.getAssociation().equals(association))
+                .filter(associationMember -> role == null || associationMember.getRole().equals(role))
+                .findFirst();
+    }
+
+    private void checkInvoiceNotPaidByAnyAssociationMember(Invoice invoice) {
+        if (invoice.getInvoiceDistributions().stream().map(InvoiceDistribution::getPayment).anyMatch(Objects::nonNull)) {
+            throw new BadRequestException(CANNOT_DELETE_PAID_INVOICES);
+        }
     }
 }

@@ -39,7 +39,7 @@ public class ExceptionControllerAdvice {
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException exception) {
         List<ErrorEntity> errors = exception.getBindingResult().getFieldErrors().stream()
-                .map(e -> new ErrorEntity(-1, e.getDefaultMessage()))
+                .map(e -> new ErrorEntity(-1, e.getDefaultMessage(), e.getField()))
                 .toList();
 
         return ResponseEntity

@@ -16,5 +16,6 @@ public record InvoiceResponseDto (
         Double amount,
         InvoiceType type,
         InvoiceMethod method,
-        String associationId
+        Double pricePerIndexUnit,
+        AssociationResponseDto association
 ) { }

@@ -43,6 +43,9 @@ public class Association {
     @Column(name = "number")
     private String number;
 
+    @Column(name = "block")
+    private String block;
+
     @Column(name = "staircase")
     private String staircase;
 
@@ -60,4 +63,7 @@ public class Association {
 
     @OneToMany(mappedBy = "association", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
     private List<Invoice> invoices = new ArrayList<>();
+
+    @OneToMany(mappedBy = "association", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    private List<Post> posts = new ArrayList<>();
 }

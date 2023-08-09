@@ -1,5 +1,6 @@
 package com.oam.dto;
 
+import java.util.List;
 import java.util.UUID;
 
 public record ApartmentResponseDto(
@@ -8,5 +9,7 @@ public record ApartmentResponseDto(
         Integer numberOfPersons,
         String code,
         Double surface,
-        UUID associationId
+        AssociationResponseDto association,
+        List<UserResponseDto> admins,
+        List<UserResponseDto> members
 ) { }

@@ -14,7 +14,7 @@ import java.util.UUID;
 @Setter
 @Getter
 @Entity
-@Table(name = "indexes")
+@Table(name = "invoices")
 public class Invoice {
 
     @Id
@@ -51,6 +51,9 @@ public class Invoice {
     @Column(name = "method")
     @Enumerated(EnumType.STRING)
     private InvoiceMethod method;
+
+    @Column(name = "price_per_index_unit")
+    private Double pricePerIndexUnit;
 
     @ManyToOne
     @JoinColumn(name = "association_id", referencedColumnName = "id")

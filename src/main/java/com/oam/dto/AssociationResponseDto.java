@@ -1,5 +1,6 @@
 package com.oam.dto;
 
+import java.util.List;
 import java.util.UUID;
 
 public record AssociationResponseDto(
@@ -10,7 +11,11 @@ public record AssociationResponseDto(
         String zipCode,
         String street,
         String number,
+        String block,
         String staircase,
         Double latitude,
-        Double longitude
+        Double longitude,
+        List<SimplifiedApartmentResponseDto> apartments,
+        List<UserResponseDto> members,
+        List<UserResponseDto> admins
 ) { }

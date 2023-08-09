@@ -24,6 +24,9 @@ public record UpdateAssociationRequestDto (
         @NotBlank(message = "Number is mandatory!")
         String number,
 
+        @NotBlank(message = "Block is mandatory!")
+        String block,
+
         @NotBlank(message = "Staircase is mandatory!")
         String staircase
 ) { }

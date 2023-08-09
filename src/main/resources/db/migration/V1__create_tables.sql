@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS `associations` (
     `zip_code` VARCHAR(50) NOT NULL,
     `street` VARCHAR(50) NOT NULL,
     `number` VARCHAR(50) NOT NULL,
+    `block` VARCHAR(50) NOT NULL,
     `staircase` VARCHAR(50) NOT NULL,
     `latitude` DOUBLE NOT NULL,
     `longitude` DOUBLE NOT NULL,
@@ -70,6 +71,7 @@ CREATE TABLE IF NOT EXISTS `invoices` (
     `amount` DOUBLE NOT NULL,
     `type` VARCHAR(50) NOT NULL,
     `method` VARCHAR(50) NOT NULL,
+    `price_per_index_unit` DOUBLE,
     `association_id` VARCHAR(50) NOT NULL,
 
     PRIMARY KEY (`id`),
@@ -89,14 +91,52 @@ CREATE TABLE IF NOT EXISTS `indexes` (
     FOREIGN KEY (`apartment_id`) REFERENCES `apartments`(`id`)
 );
 
+CREATE TABLE IF NOT EXISTS `payments` (
+    `id` VARCHAR(50) NOT NULL,
+    `amount` DOUBLE NOT NULL,
+    `status` VARCHAR(70) NOT NULL,
+    `date` DATETIME NOT NULL,
+    `user_id` VARCHAR(50) NOT NULL,
+
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
+);
+
 CREATE TABLE IF NOT EXISTS `invoices_distribution` (
     `id` VARCHAR(50) NOT NULL,
     `amount` DOUBLE NOT NULL,
-    `is_paid` BOOLEAN NOT NULL,
     `apartment_id` VARCHAR(50) NOT NULL,
     `invoice_id` VARCHAR(50) NOT NULL,
+    `payment_id` VARCHAR(50),
 
     PRIMARY KEY (`id`),
     FOREIGN KEY (`apartment_id`) REFERENCES `apartments`(`id`),
-    FOREIGN KEY (`invoice_id`) REFERENCES `invoices`(`id`)
+    FOREIGN KEY (`invoice_id`) REFERENCES `invoices`(`id`),
+    FOREIGN KEY (`payment_id`) REFERENCES `payments`(`id`)
+);
+
+CREATE TABLE IF NOT EXISTS `posts` (
+    `id` VARCHAR(50) NOT NULL,
+    `title` TEXT NOT NULL,
+    `text` TEXT NOT NULL,
+    `summary` TEXT NOT NULL,
+    `date` DATETIME NOT NULL,
+    `user_id` VARCHAR(50) NOT NULL,
+    `association_id` VARCHAR(50) NOT NULL,
+
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`id`),
+    FOREIGN KEY (`association_id`) REFERENCES `associations`(`id`)
+);
+
+CREATE TABLE IF NOT EXISTS `comments` (
+    `id` VARCHAR(50) NOT NULL,
+    `text` TEXT NOT NULL,
+    `date` DATETIME NOT NULL,
+    `user_id` VARCHAR(50) NOT NULL,
+    `post_id` VARCHAR(50) NOT NULL,
+
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`id`),
+    FOREIGN KEY (`post_id`) REFERENCES `posts`(`id`)
 );

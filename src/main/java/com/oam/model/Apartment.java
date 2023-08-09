@@ -43,7 +43,7 @@ public class Apartment {
             fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE},
             orphanRemoval = true)
-    private List<AssociationMember> associationMembers;
+    private List<AssociationMember> associationMembers = new ArrayList<>();
 
 
     @ManyToOne

@@ -48,7 +48,8 @@ public class WebSecurityConfig {
                             authorize
                                     .requestMatchers(
                                             antMatcher(HttpMethod.POST, SIGN_UP_URL),
-                                            antMatcher(HttpMethod.POST, FORGOT_PASSWORD_URL)
+                                            antMatcher(HttpMethod.POST, FORGOT_PASSWORD_URL),
+                                            antMatcher(HttpMethod.POST, "/api/stripe/webhook")
                                     ).permitAll()
                                     .anyRequest().authenticated();
                         } catch (Exception e) {

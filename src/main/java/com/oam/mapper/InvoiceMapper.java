@@ -6,10 +6,9 @@ import com.oam.model.Invoice;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = AssociationMapper.class)
 public interface InvoiceMapper {
 
-    @Mapping(source = "association.id", target = "associationId")
     InvoiceResponseDto mapToDto(Invoice invoice);
 
     @Mapping(source = "associationId", target = "association.id")

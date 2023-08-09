@@ -1,6 +1,7 @@
 package com.oam.service;
 
 import com.oam.exception.ErrorMessage;
+import com.oam.exception.model.BadRequestException;
 import com.oam.exception.model.ForbiddenException;
 import com.oam.exception.model.NotFoundException;
 import com.oam.model.*;
@@ -57,14 +58,15 @@ public class AssociationService {
         Association association = getById(id);
         checkUserIsAssociationMemberWithAdminRights(user, association);
 
-        associationRepository.deleteAssociationMembersByFamilyId(association.getId());
+        associationRepository.deleteAssociationMembersByAssociationId(association.getId());
         association.getAssociationMembers().clear();
 
         associationRepository.delete(association);
     }
 
     public void join(String code) {
-        Association correspondingAssociation = associationRepository.findAssociationByApartmentCode(code).orElseThrow();
+        Association correspondingAssociation = associationRepository.findAssociationByApartmentCode(code)
+                .orElseThrow(() -> new BadRequestException(ErrorMessage.INVALID_ASSOCIATION_CODE));
         User user = userService.getById(securityService.getUserId());
         if (getAssociationMember(user, correspondingAssociation, MEMBER).isPresent()) {
             return;
@@ -73,7 +75,10 @@ public class AssociationService {
         correspondingAssociation.getApartments().stream()
                 .filter(apartment -> apartment.getCode().equals(code))
                 .findFirst()
-                .ifPresent(associationMember::setApartment);
+                .ifPresent((apartment) -> {
+                    associationMember.setApartment(apartment);
+                    apartment.getAssociationMembers().add(associationMember);
+                });
         correspondingAssociation.getAssociationMembers().add(associationMember);
         associationRepository.save(correspondingAssociation);
     }
@@ -106,6 +111,7 @@ public class AssociationService {
         to.setLocality(from.getLocality());
         to.setNumber(from.getNumber());
         to.setZipCode(from.getZipCode());
+        to.setBlock(from.getBlock());
         to.setStaircase(from.getStaircase());
         to.setLocality(from.getLocality());
         to.setStreet(from.getStreet());
