@@ -5,6 +5,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.oam.exception.ErrorMessage;
 import com.oam.exception.model.InternalServerErrorException;
+import com.oam.model.User;
+import com.oam.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,11 +14,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.oam.util.SecurityConstants.*;
@@ -57,10 +62,12 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                     .verify(token.replace(TOKEN_PREFIX, ""));
 
             if (decodedJWT.getSubject() != null) {
+                List<String> authorities = decodedJWT.getClaim(AUTHORITIES).asList(String.class);
                 Map<String, String> claims = new HashMap<>();
                 claims.put(USER_ID, decodedJWT.getClaim(USER_ID).as(String.class));
 
-                return new CustomAuthenticationToken(decodedJWT.getSubject(), claims);
+                return new CustomAuthenticationToken(decodedJWT.getSubject(), claims,
+                        authorities.stream().map(authority -> (GrantedAuthority) () -> authority).toList());
             }
         }
 

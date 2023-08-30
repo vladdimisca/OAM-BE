@@ -55,6 +55,9 @@ public class Association {
     @Column(name = "longitude")
     private Double longitude;
 
+    @Column(name = "iban")
+    private String iban;
+
     @OneToMany(mappedBy = "association", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
     private List<AssociationMember> associationMembers = new ArrayList<>();
 

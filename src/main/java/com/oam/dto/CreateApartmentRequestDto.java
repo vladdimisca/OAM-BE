@@ -7,16 +7,16 @@ import java.util.UUID;
 
 public record CreateApartmentRequestDto(
 
-        @NotBlank(message = "Street is mandatory!")
+        @NotBlank(message = "The number is mandatory!")
         String number,
 
-        @NotNull(message = "Street is mandatory!")
+        @NotNull(message = "The number of persons is mandatory!")
         Integer numberOfPersons,
 
-        @NotNull(message = "Surface is mandatory!")
+        @NotNull(message = "The surface is mandatory!")
         Double surface,
 
-        @NotNull(message = "Association id is mandatory!")
+        @NotNull(message = "Association is mandatory!")
         UUID associationId
 ) {
 }

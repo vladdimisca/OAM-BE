@@ -3,8 +3,10 @@ package com.oam.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oam.dto.CreateInvoiceRequestDto;
 import com.oam.dto.InvoiceResponseDto;
+import com.oam.dto.StatisticsResponseDto;
 import com.oam.mapper.InvoiceMapper;
 import com.oam.model.Invoice;
+import com.oam.model.Statistics;
 import com.oam.service.InvoiceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -52,5 +54,11 @@ public class InvoiceController {
     public ResponseEntity<?> deleteById(@PathVariable("id") UUID id) {
         invoiceService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<StatisticsResponseDto> getStatistics() {
+        Statistics statistics = invoiceService.getStatistics();
+        return ResponseEntity.ok(new StatisticsResponseDto(statistics.getLabels(), statistics.getData()));
     }
 }

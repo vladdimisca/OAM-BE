@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.oam.model.AssociationRole.ADMIN;
+import static com.oam.model.AssociationRole.MEMBER;
 
 @Service
 @RequiredArgsConstructor
@@ -73,11 +74,12 @@ public class ApartmentService {
     }
 
     @Transactional
-    public void leave(UUID apartmentId) {
+    public void leaveApartmentById(UUID apartmentId) {
         Apartment apartment = getById(apartmentId);
         User user = userService.getById(securityService.getUserId());
-        apartment.getAssociationMembers().removeIf(am -> am.getMember().getId().equals(user.getId()));
-        apartment.getAssociation().getAssociationMembers().removeIf(am -> am.getMember().getId().equals(user.getId()));
+        apartment.getAssociationMembers()
+                .removeIf(am -> am.getMember().getId().equals(user.getId()) && am.getRole() == MEMBER);
+        apartment.setCode(generateUniqueApartmentCode());
         apartmentRepository.save(apartment);
     }
 

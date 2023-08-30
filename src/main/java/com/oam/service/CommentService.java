@@ -5,7 +5,6 @@ import com.oam.exception.model.ForbiddenException;
 import com.oam.exception.model.NotFoundException;
 import com.oam.model.*;
 import com.oam.repository.CommentRepository;
-import com.oam.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,13 +34,37 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
-    public Comment getById(UUID id) {
-        return commentRepository.findById(id).orElseThrow(() ->
-                new NotFoundException(ErrorMessage.NOT_FOUND, "comment", id));
+    public Comment updateById(UUID id, Comment comment) {
+        User user = userService.getById(securityService.getUserId());
+        Comment existingComment = getById(id);
+        if (!existingComment.getUser().getId().equals(user.getId())) {
+            throw new ForbiddenException(ErrorMessage.FORBIDDEN);
+        }
+        existingComment.setText(comment.getText());
+        return commentRepository.save(existingComment);
     }
 
-    public List<Comment> getAll() {
-        return commentRepository.findAll();
+    public Comment getById(UUID id) {
+        User user = userService.getById(securityService.getUserId());
+        Comment comment = commentRepository.findById(id).orElseThrow(() ->
+                new NotFoundException(ErrorMessage.NOT_FOUND, "comment", id));
+        if (getAssociationMember(user, comment.getPost().getAssociation()).isEmpty()) {
+            throw new ForbiddenException(ErrorMessage.FORBIDDEN);
+        }
+        return comment;
+    }
+
+    public List<Comment> getAll(UUID postId) {
+        return commentRepository.findAllByPostId(postId);
+    }
+
+    public void deleteById(UUID id) {
+        User user = userService.getById(securityService.getUserId());
+        Comment comment = getById(id);
+        if (!comment.getUser().getId().equals(user.getId())) {
+            throw new ForbiddenException(ErrorMessage.FORBIDDEN);
+        }
+        commentRepository.delete(comment);
     }
 
     private Optional<AssociationMember> getAssociationMember(User user, Association association) {

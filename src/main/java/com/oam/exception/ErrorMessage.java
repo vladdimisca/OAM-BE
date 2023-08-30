@@ -23,7 +23,9 @@ public enum ErrorMessage {
     INDEX_ALREADY_UPLOADED(15, "The index was already uploaded!"),
     EMPTY_INVOICE_DISTRIBUTION_LIST(16, "You must select at least one invoice to pay!"),
     PAYMENT_ALREADY_DONE(17, "There is a payment which is already in progress or finished!"),
-    MUST_BE_ASSOCIATION_MEMBER(18, "You must be an association member to perform this action!");
+    MUST_BE_ASSOCIATION_MEMBER(18, "You must be an association member to perform this action!"),
+    CANNOT_REMOVE_LAST_ADMIN(19, "You cannot remove the last admin from an association!"),
+    ACCOUNT_IS_BANNED(20, "This account has been banned by the administrators!");
 
 
     private final int errorCode;

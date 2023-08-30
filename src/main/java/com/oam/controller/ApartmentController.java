@@ -3,7 +3,6 @@ package com.oam.controller;
 import com.oam.dto.*;
 import com.oam.mapper.ApartmentMapper;
 import com.oam.model.Apartment;
-import com.oam.model.Association;
 import com.oam.service.ApartmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,9 +31,9 @@ public class ApartmentController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ApartmentResponseDto> update(@PathVariable("id") UUID id,
-                                                         @Valid @RequestBody UpdateApartmentRequestDto updateApartmentRequestDto) {
-        Apartment association = apartmentService.updateById(id, apartmentMapper.mapToEntity(updateApartmentRequestDto));
-        return ResponseEntity.ok(apartmentMapper.mapToDto(association));
+                                                       @Valid @RequestBody UpdateApartmentRequestDto updateApartmentRequestDto) {
+        Apartment apartment = apartmentService.updateById(id, apartmentMapper.mapToEntity(updateApartmentRequestDto));
+        return ResponseEntity.ok(apartmentMapper.mapToDto(apartment));
     }
 
     @GetMapping("/{id}")
@@ -52,6 +51,12 @@ public class ApartmentController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteById(@PathVariable("id") UUID id) {
         apartmentService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/leave")
+    public ResponseEntity<?> leaveApartmentById(@PathVariable("id") UUID id) {
+        apartmentService.leaveApartmentById(id);
         return ResponseEntity.noContent().build();
     }
 }

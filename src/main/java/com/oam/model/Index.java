@@ -40,6 +40,10 @@ public class Index {
     private InvoiceType type;
 
     @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
+
+    @ManyToOne
     @JoinColumn(name = "apartment_id", referencedColumnName = "id")
     private Apartment apartment;
 }

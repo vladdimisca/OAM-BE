@@ -34,5 +34,8 @@ public record CreateAssociationRequestDto(
         Double latitude,
 
         @NotNull(message = "Latitude is mandatory!")
-        Double longitude
+        Double longitude,
+
+        @NotBlank(message = "Iban is mandatory!")
+        String iban
 ) { }

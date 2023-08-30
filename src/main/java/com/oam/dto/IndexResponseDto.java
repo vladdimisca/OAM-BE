@@ -11,6 +11,7 @@ public record IndexResponseDto(
         Integer month,
         Integer year,
         InvoiceType type,
-        ApartmentResponseDto apartment
+        ApartmentResponseDto apartment,
+        UserResponseDto user
 ) {
 }

@@ -3,6 +3,7 @@ package com.oam.service;
 import com.oam.exception.ErrorMessage;
 import com.oam.exception.model.BadRequestException;
 import com.oam.exception.model.ConflictException;
+import com.oam.exception.model.ForbiddenException;
 import com.oam.exception.model.NotFoundException;
 import com.oam.model.Role;
 import com.oam.model.User;
@@ -15,6 +16,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -33,6 +37,7 @@ public class UserService {
         checkPhoneNumberNotUsed(user.getUserDetails().getCallingCode(), user.getUserDetails().getPhoneNumber());
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setRole(Role.USER);
+        user.setIsBanned(false);
 
         return userRepository.save(user);
     }
@@ -105,6 +110,19 @@ public class UserService {
         sendNewPasswordViaEmail(user, newPassword);
     }
 
+    public void banById(UUID id) {
+        User userToBeBanned = getById(id);
+        if (!securityService.hasRole(Role.ADMIN) || userToBeBanned.getRole().equals(Role.ADMIN)) {
+            throw new ForbiddenException(ErrorMessage.FORBIDDEN);
+        }
+        userToBeBanned.setIsBanned(true);
+        userRepository.save(userToBeBanned);
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
     private void sendNewPasswordViaEmail(User user, String newPassword) {
         String text = String.format(
                 """
@@ -115,11 +133,11 @@ public class UserService {
                 For security reasons, we recommend you to change it as soon as possible!
                 
                 Kind regards,
-                OAM Team
+                Support Team
                 """,
                 user.getUserDetails().getFirstName(), newPassword);
 
-        emailSenderService.sendSimpleMessage(user, "Your OAM password has been reset", text);
+        emailSenderService.sendSimpleMessage(user, "Your password has been reset", text);
     }
 
     public User getByEmail(String email) {

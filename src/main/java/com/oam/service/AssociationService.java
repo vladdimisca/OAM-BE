@@ -11,10 +11,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.oam.exception.ErrorMessage.CANNOT_REMOVE_LAST_ADMIN;
 import static com.oam.model.AssociationRole.ADMIN;
 import static com.oam.model.AssociationRole.MEMBER;
 
@@ -83,6 +85,43 @@ public class AssociationService {
         associationRepository.save(correspondingAssociation);
     }
 
+    @Transactional
+    public void removeMemberFromAssociation(UUID userId, UUID associationId) {
+        User authenticatedUser = userService.getById(securityService.getUserId());
+        Association association = getById(associationId);
+        checkUserIsAssociationMemberWithAdminRights(authenticatedUser, association);
+        User user = userService.getById(userId);
+        if (association.getAssociationMembers().stream().filter(am -> am.getRole() == ADMIN).count() == 1
+            && getAssociationMember(user, association, ADMIN).isPresent()) {
+            throw new ForbiddenException(CANNOT_REMOVE_LAST_ADMIN);
+        }
+        for (AssociationMember associationMember : association.getAssociationMembers()) {
+            if (associationMember.getMember().getId().equals(user.getId())) {
+                if (associationMember.getApartment() != null) {
+                    associationMember.getApartment().setCode(generateUniqueApartmentCode());
+                    associationMember.getApartment().getAssociationMembers().remove(associationMember);
+                }
+                association.getAssociationMembers().remove(associationMember);
+            }
+        }
+        associationRepository.save(association);
+    }
+
+    @Transactional
+    public void addAdminMember(String email, UUID associationId) {
+        User user = userService.getByEmail(email);
+        if (user == null) {
+            throw new NotFoundException(ErrorMessage.EMAIL_NOT_ASSOCIATED);
+        }
+        Association association = getById(associationId);
+        if (getAssociationMember(user, association, ADMIN).isPresent()) {
+            return;
+        }
+        AssociationMember associationMember = createAssociationMember(user, association, ADMIN);
+        association.getAssociationMembers().add(associationMember);
+        associationRepository.save(association);
+    }
+
     private AssociationMember createAssociationMember(User user, Association association, AssociationRole role) {
         AssociationMember associationMember = new AssociationMember();
         associationMember.setRole(role);
@@ -105,6 +144,11 @@ public class AssociationService {
                 .findFirst();
     }
 
+    private String generateUniqueApartmentCode() {
+        String uuidNumber = String.format("%010d", new BigInteger(UUID.randomUUID().toString().replace("-", ""),16));
+        return uuidNumber.substring( uuidNumber.length() - 6);
+    }
+
     private void copyValues(Association from, Association to) {
         to.setCountry(from.getCountry());
         to.setAdministrativeArea(from.getAdministrativeArea());
@@ -115,5 +159,6 @@ public class AssociationService {
         to.setStaircase(from.getStaircase());
         to.setLocality(from.getLocality());
         to.setStreet(from.getStreet());
+        to.setIban(from.getIban());
     }
 }

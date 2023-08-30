@@ -22,14 +22,19 @@ public class ChatGptService {
     public String getSummary(String text) {
         ChatRequest request = new ChatRequest(model, getPrompt(text));
         ChatResponse response = getRestTemplate().postForObject(apiUrl, request, ChatResponse.class);
-        if (response == null || response.choices.isEmpty()) {
-            return "Could not generate the summary";
+        if (response == null || response.choices.isEmpty()
+                || response.choices().get(0).message().content().contains("I apologize")) {
+            return "Sorry, but we could not generate the summary!";
         }
-        return response.choices().get(0).message().content();
+        return response.choices().get(0).message().content().replaceFirst("Summary: ", "");
     }
 
     private String getPrompt(String text) {
-        return "Make a short summary: " + text;
+        return String.format(
+                """
+                Summarize as much as you can the following announcement which might be in romanian, but say "I apologize" if you really have no idea.
+                This is the announcement I want you to summarize: %s
+                """, text);
     }
 
     private RestTemplate getRestTemplate() {
@@ -54,7 +59,7 @@ public class ChatGptService {
             Integer maxTokens
     ) {
         public ChatRequest(String model, String text) {
-            this(model, List.of(new Message("user", text)), 40);
+            this(model, List.of(new Message("user", text)), 50);
         }
     }
 

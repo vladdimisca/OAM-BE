@@ -56,6 +56,10 @@ public class Invoice {
     private Double pricePerIndexUnit;
 
     @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
+
+    @ManyToOne
     @JoinColumn(name = "association_id", referencedColumnName = "id")
     private Association association;
 

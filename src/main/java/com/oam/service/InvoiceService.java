@@ -14,10 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Timestamp;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.*;
 
 import static com.oam.exception.ErrorMessage.CANNOT_DELETE_PAID_INVOICES;
 
@@ -50,6 +48,8 @@ public class InvoiceService {
         }
         Association association = associationService.getById(invoice.getAssociation().getId());
         invoice.setAssociation(association);
+        User user = userService.getById(securityService.getUserId());
+        invoice.setUser(user);
         Invoice persistedInvoice = invoiceRepository.save(invoice);
         invoiceDistributionService.distribute(invoice);
         return persistedInvoice;
@@ -82,6 +82,35 @@ public class InvoiceService {
         }
         checkInvoiceNotPaidByAnyAssociationMember(invoice);
         invoiceRepository.delete(invoice);
+    }
+
+    public Statistics getStatistics() {
+        final String[] allMonths = {
+                "January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
+                "November", "December"
+        };
+
+        List<Invoice> invoices = invoiceRepository.findAll();
+        List<String> months = new ArrayList<>();
+        List<Integer> values = new ArrayList<>();
+
+        LocalDateTime currentDateTime = LocalDateTime.now();
+
+        for (int month = 1; month <= currentDateTime.getMonthValue(); month++) {
+            final int finalMonth = month; // variables used in lambda expression should be final or effectively final
+
+            var newInvoices = invoices.stream()
+                    .filter(invoice -> invoice.getYear() == currentDateTime.getYear() && invoice.getYear() == finalMonth)
+                    .toList();
+
+            months.add(allMonths[finalMonth - 1]);
+            values.add(newInvoices.size());
+        }
+
+        Statistics statistics = new Statistics();
+        statistics.setLabels(months);
+        statistics.setData(values);
+        return statistics;
     }
 
     private Optional<AssociationMember> getAssociationMember(User user, Association association, AssociationRole role) {

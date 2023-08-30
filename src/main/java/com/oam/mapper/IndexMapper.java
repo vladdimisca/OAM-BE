@@ -6,7 +6,7 @@ import com.oam.model.Index;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = ApartmentMapper.class)
+@Mapper(componentModel = "spring", uses = { ApartmentMapper.class, UserMapper.class })
 public interface IndexMapper {
 
     IndexResponseDto mapToDto(Index index);

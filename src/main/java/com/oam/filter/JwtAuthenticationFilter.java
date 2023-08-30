@@ -3,7 +3,9 @@ package com.oam.filter;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.oam.exception.ErrorEntity;
 import com.oam.exception.ErrorMessage;
+import com.oam.exception.ErrorResponse;
 import com.oam.exception.model.InternalServerErrorException;
 import com.oam.model.User;
 import com.oam.service.UserService;
@@ -15,12 +17,16 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import javax.security.sasl.AuthenticationException;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
+import static com.oam.exception.ErrorMessage.ACCOUNT_IS_BANNED;
 import static com.oam.util.SecurityConstants.*;
 import static com.oam.util.SecurityConstants.SECRET_KEY_ENV;
 
@@ -64,15 +70,20 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         UserService userService = context.getBean(UserService.class);
         User user = userService.getByEmail(((UserDetails) auth.getPrincipal()).getUsername());
+        if (user.getIsBanned()) {
+            res.setStatus(403);
+            res.getWriter().write(ACCOUNT_IS_BANNED.getErrorMessage());
+        } else {
+            String token = JWT.create()
+                    .withSubject(user.getEmail())
+                    .withClaim(USER_ID, user.getId().toString())
+                    .withClaim(AUTHORITIES, List.of("ROLE_" + user.getRole().name()))
+                    .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                    .sign(Algorithm.HMAC512(secretKey.getBytes()));
 
-        String token = JWT.create()
-                .withSubject(user.getEmail())
-                .withClaim(USER_ID, user.getId().toString())
-                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .sign(Algorithm.HMAC512(secretKey.getBytes()));
-
-        res.setHeader("Authorization", token);
-        res.setHeader("userId", user.getId().toString());
+            res.setHeader("Authorization", token);
+            res.setHeader("userId", user.getId().toString());
+        }
         res.getWriter().flush();
     }
 }

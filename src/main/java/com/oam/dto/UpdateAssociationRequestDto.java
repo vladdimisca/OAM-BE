@@ -28,5 +28,8 @@ public record UpdateAssociationRequestDto (
         String block,
 
         @NotBlank(message = "Staircase is mandatory!")
-        String staircase
+        String staircase,
+
+        @NotBlank(message = "Iban is mandatory!")
+        String iban
 ) { }

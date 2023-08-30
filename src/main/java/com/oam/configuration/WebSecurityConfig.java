@@ -4,6 +4,7 @@ import com.oam.exception.ErrorMessage;
 import com.oam.exception.model.NotFoundException;
 import com.oam.filter.JwtAuthenticationFilter;
 import com.oam.filter.JwtAuthorizationFilter;
+import com.oam.model.Role;
 import com.oam.model.User;
 import com.oam.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +52,9 @@ public class WebSecurityConfig {
                                             antMatcher(HttpMethod.POST, FORGOT_PASSWORD_URL),
                                             antMatcher(HttpMethod.POST, "/api/stripe/webhook")
                                     ).permitAll()
+                                    .requestMatchers(
+                                            antMatcher(HttpMethod.POST, "/api/users/*/ban")
+                                    ).hasRole(Role.ADMIN.name())
                                     .anyRequest().authenticated();
                         } catch (Exception e) {
                             throw new RuntimeException(e);

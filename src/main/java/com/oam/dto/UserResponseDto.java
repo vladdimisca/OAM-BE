@@ -15,5 +15,6 @@ public record UserResponseDto(
         String lastName,
         String description,
         String profilePictureURL,
-        String role
+        String role,
+        Boolean isBanned
 ) { }

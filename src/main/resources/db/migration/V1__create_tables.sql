@@ -15,9 +15,11 @@ CREATE TABLE IF NOT EXISTS `users` (
     `email` VARCHAR(100) UNIQUE NOT NULL,
     `password` VARCHAR(100) NOT NULL,
     `role` VARCHAR(50) NOT NULL,
+    `is_banned` BOOLEAN NOT NULL,
     `fk_user_details` VARCHAR(50) NOT NULL,
 
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`fk_user_details`) REFERENCES `user_details`(`id`)
 );
 
 CREATE TABLE IF NOT EXISTS `associations` (
@@ -32,6 +34,7 @@ CREATE TABLE IF NOT EXISTS `associations` (
     `staircase` VARCHAR(50) NOT NULL,
     `latitude` DOUBLE NOT NULL,
     `longitude` DOUBLE NOT NULL,
+    `iban` VARCHAR(100) NOT NULL,
 
     PRIMARY KEY (`id`)
 );
@@ -73,9 +76,11 @@ CREATE TABLE IF NOT EXISTS `invoices` (
     `method` VARCHAR(50) NOT NULL,
     `price_per_index_unit` DOUBLE,
     `association_id` VARCHAR(50) NOT NULL,
+    `user_id` VARCHAR(50) NOT NULL,
 
     PRIMARY KEY (`id`),
-    FOREIGN KEY (`association_id`) REFERENCES `associations`(`id`)
+    FOREIGN KEY (`association_id`) REFERENCES `associations`(`id`),
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
 );
 
 CREATE TABLE IF NOT EXISTS `indexes` (
@@ -86,9 +91,11 @@ CREATE TABLE IF NOT EXISTS `indexes` (
     `month` INT NOT NULL,
     `year` INT NOT NULL,
     `apartment_id` VARCHAR(50) NOT NULL,
+    `user_id` VARCHAR(50) NOT NULL,
 
     PRIMARY KEY (`id`),
-    FOREIGN KEY (`apartment_id`) REFERENCES `apartments`(`id`)
+    FOREIGN KEY (`apartment_id`) REFERENCES `apartments`(`id`),
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
 );
 
 CREATE TABLE IF NOT EXISTS `payments` (

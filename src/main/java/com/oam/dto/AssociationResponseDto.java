@@ -15,6 +15,7 @@ public record AssociationResponseDto(
         String staircase,
         Double latitude,
         Double longitude,
+        String iban,
         List<SimplifiedApartmentResponseDto> apartments,
         List<UserResponseDto> members,
         List<UserResponseDto> admins

@@ -39,13 +39,42 @@ public class PostService {
         return postRepository.save(post);
     }
 
+    public Post updateById(UUID id, Post post) {
+        User user = userService.getById(securityService.getUserId());
+        Post existingPost = getById(id);
+        if (!existingPost.getUser().getId().equals(user.getId())) {
+            throw new ForbiddenException(ErrorMessage.FORBIDDEN);
+        }
+        if (!existingPost.getText().equals(post.getText())) {
+            existingPost.setSummary(chatGptService.getSummary(post.getText()));
+        }
+        existingPost.setText(post.getText());
+        existingPost.setTitle(post.getTitle());
+        return postRepository.save(existingPost);
+    }
+
     public Post getById(UUID id) {
-        return postRepository.findById(id).orElseThrow(() ->
+        User user = userService.getById(securityService.getUserId());
+        Post post = postRepository.findById(id).orElseThrow(() ->
                 new NotFoundException(ErrorMessage.NOT_FOUND, "post", id));
+        if (getAssociationMember(user, post.getAssociation()).isEmpty()) {
+            throw new ForbiddenException(ErrorMessage.FORBIDDEN);
+        }
+        return post;
     }
 
     public List<Post> getAll() {
-        return postRepository.findAll();
+        User user = userService.getById(securityService.getUserId());
+        return postRepository.findAllByUserId(user.getId());
+    }
+
+    public void deleteById(UUID id) {
+        User user = userService.getById(securityService.getUserId());
+        Post post = getById(id);
+        if (!post.getUser().getId().equals(user.getId())) {
+            throw new ForbiddenException(ErrorMessage.FORBIDDEN);
+        }
+        postRepository.delete(post);
     }
 
     private Optional<AssociationMember> getAssociationMember(User user, Association association) {

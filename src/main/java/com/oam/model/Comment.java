@@ -16,6 +16,7 @@ import java.util.UUID;
 public class Comment {
 
     @Id
+    @Column(name = "id")
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(
             name = "UUID",

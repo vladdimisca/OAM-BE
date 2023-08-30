@@ -62,4 +62,18 @@ public class AssociationController {
         associationService.join(code);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{id}/removeMember/{userId}")
+    public ResponseEntity<?> removeUserFromAssociation(@PathVariable("id") UUID id,
+                                                       @PathVariable("userId") UUID userId) {
+        associationService.removeMemberFromAssociation(userId, id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/addAdmin/{email}")
+    public ResponseEntity<?> assAdminMember(@PathVariable("id") UUID id,
+                                            @PathVariable("email") String email) {
+        associationService.addAdminMember(email, id);
+        return ResponseEntity.noContent().build();
+    }
 }

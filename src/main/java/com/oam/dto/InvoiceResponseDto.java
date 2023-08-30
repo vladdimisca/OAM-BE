@@ -17,5 +17,6 @@ public record InvoiceResponseDto (
         InvoiceType type,
         InvoiceMethod method,
         Double pricePerIndexUnit,
-        AssociationResponseDto association
+        AssociationResponseDto association,
+        UserResponseDto user
 ) { }

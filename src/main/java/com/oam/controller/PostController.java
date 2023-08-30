@@ -2,6 +2,7 @@ package com.oam.controller;
 
 import com.oam.dto.CreatePostRequestDto;
 import com.oam.dto.PostResponseDto;
+import com.oam.dto.UpdatePostRequestDto;
 import com.oam.mapper.PostMapper;
 import com.oam.model.Post;
 import com.oam.service.PostService;
@@ -27,6 +28,13 @@ public class PostController {
         return ResponseEntity.ok(postMapper.mapToDto(post));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<PostResponseDto> update(@PathVariable("id") UUID id,
+                                                  @Valid @RequestBody UpdatePostRequestDto updatePostRequestDto) {
+        Post post = postService.updateById(id, postMapper.mapToEntity(updatePostRequestDto));
+        return ResponseEntity.ok(postMapper.mapToDto(post));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<PostResponseDto> getById(@PathVariable("id") UUID id) {
         Post post = postService.getById(id);
@@ -37,5 +45,11 @@ public class PostController {
     public ResponseEntity<List<PostResponseDto>> getAll() {
         List<Post> posts = postService.getAll();
         return ResponseEntity.ok(posts.stream().map(postMapper::mapToDto).toList());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteById(@PathVariable("id") UUID id) {
+        postService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

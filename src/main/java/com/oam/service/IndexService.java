@@ -33,6 +33,8 @@ public class IndexService {
         if (isIndexAlreadyUploaded(apartment, index)) {
             throw new ConflictException(ErrorMessage.INDEX_ALREADY_UPLOADED);
         }
+        User user = userService.getById(securityService.getUserId());
+        index.setUser(user);
         return indexRepository.save(index);
     }
 

@@ -10,4 +10,5 @@ public final class SecurityConstants {
     public static final String FORGOT_PASSWORD_URL = "/api/users/*/forgotPassword";
     public static final String SIGN_IN_URL = "/api/users/login";
     public static final String USER_ID = "USER_ID";
+    public static final String AUTHORITIES = "AUTHORITIES";
 }

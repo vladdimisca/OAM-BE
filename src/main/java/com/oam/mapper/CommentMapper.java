@@ -1,9 +1,6 @@
 package com.oam.mapper;
 
-import com.oam.dto.CommentResponseDto;
-import com.oam.dto.CreateCommentRequestDto;
-import com.oam.dto.CreatePostRequestDto;
-import com.oam.dto.PostResponseDto;
+import com.oam.dto.*;
 import com.oam.model.Comment;
 import com.oam.model.Post;
 import org.mapstruct.Mapper;
@@ -16,4 +13,6 @@ public interface CommentMapper {
 
     @Mapping(source = "postId", target = "post.id")
     Comment mapToEntity(CreateCommentRequestDto createCommentRequestDto);
+
+    Comment mapToEntity(UpdateCommentRequestDto updateCommentRequestDto);
 }

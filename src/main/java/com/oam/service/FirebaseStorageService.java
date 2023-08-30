@@ -26,7 +26,7 @@ public class FirebaseStorageService {
     public URL uploadFile(String imageName, MultipartFile image, String contentType) throws IOException {
         Blob blob = getDefaultBucket().create(imageName, image.getInputStream(), contentType);
         BlobInfo blobInfo = BlobInfo.newBuilder(System.getenv(FirebaseConstants.BUCKET_NAME), blob.getName()).build();
-        return getDefaultBucket().getStorage().signUrl(blobInfo, 365 * 10, TimeUnit.DAYS);
+        return getDefaultBucket().getStorage().signUrl(blobInfo, 365 * 25, TimeUnit.DAYS);
     }
 
     private Bucket getDefaultBucket() {

@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
@@ -71,5 +72,16 @@ public class UserController {
     public ResponseEntity<?> forgotPassword(@PathVariable("email") String email) {
         userService.sendNewPasswordByEmail(email);
         return ResponseEntity.ok("A new password has been sent to you by email.");
+    }
+
+    @PostMapping("/{id}/ban")
+    public ResponseEntity<?> banById(@PathVariable("id") UUID id) {
+        userService.banById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserResponseDto>> getAllUsers() {
+        return ResponseEntity.ok(userService.getAllUsers().stream().map(userMapper::mapToDto).toList());
     }
 }
