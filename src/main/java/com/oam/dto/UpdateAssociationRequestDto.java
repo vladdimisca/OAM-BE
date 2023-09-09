@@ -1,35 +1,36 @@
 package com.oam.dto;
 
+import com.oam.model.validator.IbanConstraint;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
 public record UpdateAssociationRequestDto (
 
-        @NotBlank(message = "Country is mandatory!")
+        @NotBlank(message = "The country is mandatory!")
         String country,
 
-        @NotBlank(message = "Locality is mandatory!")
+        @NotBlank(message = "The locality is mandatory!")
         String locality,
 
-        @NotBlank(message = "Administrative area is mandatory!")
+        @NotBlank(message = "The administrative area is mandatory!")
         String administrativeArea,
 
-        @NotBlank(message = "Zip code is mandatory!")
-        @Pattern(regexp = "\\d+")
+        @NotBlank(message = "The zip code is mandatory!")
+        @Pattern(regexp = "\\d+", message = "The zip code must contain only digits!")
         String zipCode,
 
-        @NotBlank(message = "Street is mandatory!")
+        @NotBlank(message = "The street is mandatory!")
         String street,
 
-        @NotBlank(message = "Number is mandatory!")
+        @NotBlank(message = "The number is mandatory!")
         String number,
 
-        @NotBlank(message = "Block is mandatory!")
+        @NotBlank(message = "The block is mandatory!")
         String block,
 
-        @NotBlank(message = "Staircase is mandatory!")
+        @NotBlank(message = "The staircase is mandatory!")
         String staircase,
 
-        @NotBlank(message = "Iban is mandatory!")
+        @IbanConstraint(message = "The iban has an invalid format!")
         String iban
 ) { }

@@ -35,6 +35,16 @@ public class InvoiceService {
         if (invoice.getMethod() == InvoiceMethod.PER_COUNTER && invoice.getPricePerIndexUnit() == null) {
             throw new BadRequestException(ErrorMessage.PRICE_PER_INDEX_UNIT_NOT_PROVIDED);
         }
+        if (invoice.getMethod() != InvoiceMethod.PER_COUNTER) {
+            invoice.setPricePerIndexUnit(null);
+        }
+        Association association = associationService.getById(invoice.getAssociation().getId());
+        invoice.setAssociation(association);
+        User user = userService.getById(securityService.getUserId());
+        invoice.setUser(user);
+        if (getAssociationMember(user, association, AssociationRole.ADMIN).isEmpty()) {
+            throw new ForbiddenException(ErrorMessage.MUST_BE_ADMIN_ASSOCIATION_MEMBER);
+        }
         if (document == null) {
             List<String> documentUrls = invoiceRepository.findInvoiceUrlByNumber(invoice.getNumber());
             if (documentUrls.isEmpty()) {
@@ -46,10 +56,6 @@ public class InvoiceService {
             URL documentUrl = firebaseStorageService.uploadFile(createUniqueName(document.getName()), document, document.getContentType());
             invoice.setDocumentUrl(documentUrl.toString());
         }
-        Association association = associationService.getById(invoice.getAssociation().getId());
-        invoice.setAssociation(association);
-        User user = userService.getById(securityService.getUserId());
-        invoice.setUser(user);
         Invoice persistedInvoice = invoiceRepository.save(invoice);
         invoiceDistributionService.distribute(invoice);
         return persistedInvoice;
@@ -86,8 +92,7 @@ public class InvoiceService {
 
     public Statistics getStatistics() {
         final String[] allMonths = {
-                "January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
-                "November", "December"
+                "Jan", "Feb", "March", "April", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"
         };
 
         List<Invoice> invoices = invoiceRepository.findAll();
@@ -100,7 +105,7 @@ public class InvoiceService {
             final int finalMonth = month; // variables used in lambda expression should be final or effectively final
 
             var newInvoices = invoices.stream()
-                    .filter(invoice -> invoice.getYear() == currentDateTime.getYear() && invoice.getYear() == finalMonth)
+                    .filter(invoice -> invoice.getYear() == currentDateTime.getYear() && invoice.getMonth() == finalMonth)
                     .toList();
 
             months.add(allMonths[finalMonth - 1]);

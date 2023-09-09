@@ -9,7 +9,7 @@ public record CreateCommentRequestDto(
         @NotBlank(message = "The comment text must not be blank!")
         String text,
 
-        @NotNull(message = "Post is mandatory!")
+        @NotNull(message = "The post is mandatory!")
         UUID postId
 ) {
 }

@@ -37,4 +37,15 @@ public interface ApartmentRepository extends JpaRepository<Apartment, UUID> {
             )
             """)
     List<Apartment> findAllByUserId(@Param("userId") UUID userId);
+
+    @Query(
+            """
+            SELECT ap FROM Apartment ap
+            WHERE ap IN (
+                SELECT a FROM Apartment a
+                JOIN a.associationMembers apm
+                WHERE apm.member.id = :userId
+            )
+            """)
+    List<Apartment> findAllByUserIdAsMember(@Param("userId") UUID userId);
 }

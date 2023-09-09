@@ -80,6 +80,12 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/{id}/ban")
+    public ResponseEntity<?> removeBanById(@PathVariable("id") UUID id) {
+        userService.removeBanById(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping
     public ResponseEntity<List<UserResponseDto>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers().stream().map(userMapper::mapToDto).toList());

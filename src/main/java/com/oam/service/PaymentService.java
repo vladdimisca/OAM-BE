@@ -49,7 +49,8 @@ public class PaymentService {
         }
         payment.setAmount(amountToPay);
         Payment persistedPayment = paymentRepository.save(payment);
-        return stripeClientService.createPaymentIntent(amountToPay, persistedPayment.getId());
+        String iban = payment.getInvoiceDistributions().get(0).getApartment().getAssociation().getIban();
+        return stripeClientService.createPaymentIntent(amountToPay, persistedPayment.getId(), iban);
     }
 
     public Payment getById(UUID id) {

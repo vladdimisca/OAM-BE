@@ -53,7 +53,10 @@ public class WebSecurityConfig {
                                             antMatcher(HttpMethod.POST, "/api/stripe/webhook")
                                     ).permitAll()
                                     .requestMatchers(
-                                            antMatcher(HttpMethod.POST, "/api/users/*/ban")
+                                            antMatcher(HttpMethod.POST, "/api/users/*/ban"),
+                                            antMatcher(HttpMethod.DELETE, "/api/users/*/ban"),
+                                            antMatcher(HttpMethod.GET, "/api/invoices/statistics"),
+                                            antMatcher(HttpMethod.GET, "/api/users")
                                     ).hasRole(Role.ADMIN.name())
                                     .anyRequest().authenticated();
                         } catch (Exception e) {
@@ -108,7 +111,7 @@ public class WebSecurityConfig {
             AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
             http
                 .addFilter(new JwtAuthenticationFilter(authenticationManager, applicationContext))
-                .addFilter(new JwtAuthorizationFilter(authenticationManager));
+                .addFilter(new JwtAuthorizationFilter(authenticationManager, applicationContext));
         }
     }
 }

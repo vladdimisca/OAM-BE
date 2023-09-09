@@ -43,8 +43,9 @@ public class ApartmentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ApartmentResponseDto>> getAll(@RequestParam(value = "associationId", required = false) UUID associationId) {
-        List<Apartment> apartments = apartmentService.getAll(associationId);
+    public ResponseEntity<List<ApartmentResponseDto>> getAll(@RequestParam(value = "associationId", required = false) UUID associationId,
+                                                             @RequestParam(value = "asMember", required = false) Boolean asMember) {
+        List<Apartment> apartments = apartmentService.getAll(associationId, asMember);
         return ResponseEntity.ok(apartments.stream().map(apartmentMapper::mapToDto).toList());
     }
 

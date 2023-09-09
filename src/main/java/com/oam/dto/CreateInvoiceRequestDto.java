@@ -2,36 +2,37 @@ package com.oam.dto;
 
 import com.oam.model.InvoiceMethod;
 import com.oam.model.InvoiceType;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 
 public record CreateInvoiceRequestDto (
 
-        @NotNull(message = "Month is mandatory!")
-        @Pattern(regexp = "^(1[0-2]|[1-9])$", message = "Month must be between 1 and 12!")
+        @NotNull(message = "The month is mandatory!")
+        @Min(value = 1, message = "The month must be between 1 and 12")
+        @Max(value = 12, message = "The month must be between 1 and 12")
         Integer month,
 
-        @NotNull(message = "Year is mandatory!")
+        @NotNull(message = "The year is mandatory!")
+        @Positive(message = "The year must be a positive value!")
         Integer year,
 
-        @NotBlank(message = "Name is mandatory!")
+        @NotBlank(message = "The name is mandatory!")
         String name,
 
-        @NotBlank(message = "Number is mandatory!")
+        @NotBlank(message = "The number is mandatory!")
         String number,
 
-        @NotNull(message = "Amount is mandatory!")
+        @NotNull(message = "The amount is mandatory!")
+        @Positive(message = "The amount must be a positive value!")
         Double amount,
 
-        @NotNull(message = "Type is mandatory!")
+        @NotNull(message = "The type is mandatory!")
         InvoiceType type,
 
-        @NotNull(message = "Method is mandatory!")
+        @NotNull(message = "The method is mandatory!")
         InvoiceMethod method,
 
         Double pricePerIndexUnit,
 
-        @NotBlank(message = "Association is mandatory!")
+        @NotBlank(message = "The association is mandatory!")
         String associationId
 ) {}

@@ -5,22 +5,22 @@ import jakarta.validation.constraints.*;
 
 public record UpdateUserRequestDto(
 
-        @Email(message = "Email must have a valid format!")
-        @NotNull(message = "Email is mandatory!")
+        @Email(message = "The email must have a valid format!")
+        @NotBlank(message = "The email is mandatory!")
         String email,
 
-        @NotNull(message = "Calling code is mandatory!")
+        @NotNull(message = "The calling code is mandatory!")
         String callingCode,
 
-        @NotNull(message = "Phone number is mandatory!")
+        @NotNull(message = "The phone number is mandatory!")
         @Pattern(regexp = "^(\\+\\d{1,3}( )?)?((\\(\\d{3}\\))|\\d{3})[- .]?\\d{3}[- .]?\\d{4}$",
-                message = "Phone number must have a valid format!")
+                message = "The phone number must have a valid format!")
         String phoneNumber,
 
-        @NotBlank(message = "First name is mandatory!")
+        @NotBlank(message = "The first name is mandatory!")
         String firstName,
 
-        @NotBlank(message = "Last name is mandatory!")
+        @NotBlank(message = "The last name is mandatory!")
         String lastName,
 
         String description

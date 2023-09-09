@@ -12,6 +12,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,14 +24,19 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
+import static com.oam.exception.ErrorMessage.ACCOUNT_IS_BANNED;
 import static com.oam.util.SecurityConstants.*;
 
 @Slf4j
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
-    public JwtAuthorizationFilter(AuthenticationManager authManager) {
+    private final ApplicationContext context;
+
+    public JwtAuthorizationFilter(AuthenticationManager authManager, ApplicationContext context) {
         super(authManager);
+        this.context = context;
     }
 
     @Override
@@ -62,9 +68,16 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                     .verify(token.replace(TOKEN_PREFIX, ""));
 
             if (decodedJWT.getSubject() != null) {
+                UUID userId = decodedJWT.getClaim(USER_ID).as(UUID.class);
+                UserService userService = context.getBean(UserService.class);
+                User user = userService.getById(userId);
+                if (user.getIsBanned()) {
+                    return null;
+                }
+
                 List<String> authorities = decodedJWT.getClaim(AUTHORITIES).asList(String.class);
                 Map<String, String> claims = new HashMap<>();
-                claims.put(USER_ID, decodedJWT.getClaim(USER_ID).as(String.class));
+                claims.put(USER_ID, userId.toString());
 
                 return new CustomAuthenticationToken(decodedJWT.getSubject(), claims,
                         authorities.stream().map(authority -> (GrantedAuthority) () -> authority).toList());

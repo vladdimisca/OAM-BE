@@ -3,7 +3,9 @@ package com.oam.controller;
 import com.google.gson.JsonSyntaxException;
 import com.oam.model.PaymentStatus;
 import com.oam.service.PaymentService;
+import com.oam.service.StripeClientService;
 import com.stripe.exception.SignatureVerificationException;
+import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
 import com.stripe.model.EventDataObjectDeserializer;
 import com.stripe.model.PaymentIntent;
@@ -21,10 +23,12 @@ import java.util.UUID;
 public class StripeWebhookController {
 
     private final PaymentService paymentService;
+    private final StripeClientService stripeClientService;
 
     @PostMapping
     public ResponseEntity<?> webhook(@RequestHeader("Stripe-Signature") String signatureHeader,
-                                     @RequestBody String payload) {
+                                     @RequestBody String payload) throws StripeException {
+        System.out.println(payload);
         Event event;
         try {
             String endpointSecret = System.getenv("STRIPE_ENDPOINT_SECRET");
@@ -39,7 +43,9 @@ public class StripeWebhookController {
             if ("payment_intent.succeeded".equals(event.getType())) {
                 if (stripeObject instanceof PaymentIntent paymentIntent) {
                     UUID paymentId = UUID.fromString(paymentIntent.getMetadata().get("paymentId"));
+                    String iban = paymentIntent.getMetadata().get("iban");
                     paymentService.updatePaymentStatus(paymentId, PaymentStatus.SUCCEEDED);
+                    stripeClientService.initiatePayout(iban, paymentIntent.getAmount());
                 }
             } else if ("payment_intent.payment_failed".equals(event.getType())) {
                 if (stripeObject instanceof PaymentIntent paymentIntent) {

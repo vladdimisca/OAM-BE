@@ -28,13 +28,16 @@ public class IndexService {
         if (index.getOldIndex() > index.getNewIndex()) {
             throw new BadRequestException(ErrorMessage.NEW_INDEX_MUST_BE_GREATER_THAN_OLD_INDEX);
         }
+        User user = userService.getById(securityService.getUserId());
         Apartment apartment = apartmentService.getById(index.getApartment().getId());
+        if (getApartmentMember(user, index.getApartment()).isEmpty()) {
+            throw new ForbiddenException(ErrorMessage.FORBIDDEN);
+        }
+        index.setUser(user);
         index.setApartment(apartment);
         if (isIndexAlreadyUploaded(apartment, index)) {
             throw new ConflictException(ErrorMessage.INDEX_ALREADY_UPLOADED);
         }
-        User user = userService.getById(securityService.getUserId());
-        index.setUser(user);
         return indexRepository.save(index);
     }
 

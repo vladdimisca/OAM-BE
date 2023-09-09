@@ -53,11 +53,14 @@ public class ApartmentService {
                 new NotFoundException(ErrorMessage.NOT_FOUND, "apartment", id));
     }
 
-    public List<Apartment> getAll(UUID associationId) {
+    public List<Apartment> getAll(UUID associationId, Boolean asMember) {
         if (associationId != null) {
             return apartmentRepository.findAllByAssociation_Id(associationId);
         }
         User user = userService.getById(securityService.getUserId());
+        if (asMember != null && asMember) {
+            return apartmentRepository.findAllByUserIdAsMember(user.getId());
+        }
         return apartmentRepository.findAllByUserId(user.getId());
     }
 

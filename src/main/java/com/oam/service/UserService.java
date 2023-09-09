@@ -119,6 +119,15 @@ public class UserService {
         userRepository.save(userToBeBanned);
     }
 
+    public void removeBanById(UUID id) {
+        User bannedUser = getById(id);
+        if (!securityService.hasRole(Role.ADMIN)) {
+            throw new ForbiddenException(ErrorMessage.FORBIDDEN);
+        }
+        bannedUser.setIsBanned(false);
+        userRepository.save(bannedUser);
+    }
+
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }

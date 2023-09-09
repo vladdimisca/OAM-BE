@@ -6,13 +6,13 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 public record CreatePostRequestDto(
-        @NotBlank(message = "Title must not be blank!")
+        @NotBlank(message = "The title must not be blank!")
         String title,
 
         @NotBlank(message = "The post content must not be blank!")
         String text,
 
-        @NotNull(message = "Association is mandatory!")
+        @NotNull(message = "The association is mandatory!")
         UUID associationId
 ) {
 }
