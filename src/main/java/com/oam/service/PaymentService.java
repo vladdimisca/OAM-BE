@@ -59,7 +59,8 @@ public class PaymentService {
     }
 
     public List<Payment> getAll() {
-        return paymentRepository.findAll();
+        User user = userService.getById(securityService.getUserId());
+        return paymentRepository.findAllByUserId(user.getId());
     }
 
     @Transactional

@@ -18,6 +18,8 @@ import java.util.UUID;
 public class InvoiceDistributionService {
 
     private final InvoiceDistributionRepository invoiceDistributionRepository;
+    private final SecurityService securityService;
+    private final UserService userService;
 
     @Transactional
     public void distribute(Invoice invoice) {
@@ -120,6 +122,7 @@ public class InvoiceDistributionService {
     }
 
     public List<InvoiceDistribution> getAll() {
-        return invoiceDistributionRepository.findAll();
+        User user = userService.getById(securityService.getUserId());
+        return invoiceDistributionRepository.findAllByUserId(user.getId());
     }
 }

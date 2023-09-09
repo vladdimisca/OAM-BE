@@ -15,8 +15,8 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
     @Query(
             """
             SELECT c FROM Comment c
-            WHERE :postId IS NULL OR c.post.id = :postId
+            WHERE (:postId IS NULL AND :userId = c.user.id) OR c.post.id = :postId
             ORDER BY c.createdAt
             """)
-    List<Comment> findAllByPostId(@Param("postId") UUID postId);
+    List<Comment> findAllByPostIdOrUserId(@Param("postId") UUID postId, @Param("userId") UUID userId);
 }

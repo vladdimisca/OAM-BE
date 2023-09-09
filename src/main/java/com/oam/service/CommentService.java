@@ -55,7 +55,8 @@ public class CommentService {
     }
 
     public List<Comment> getAll(UUID postId) {
-        return commentRepository.findAllByPostId(postId);
+        User user = userService.getById(securityService.getUserId());
+        return commentRepository.findAllByPostIdOrUserId(postId, user.getId());
     }
 
     public void deleteById(UUID id) {
